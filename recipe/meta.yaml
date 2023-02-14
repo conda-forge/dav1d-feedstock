@@ -1,5 +1,5 @@
 {% set name = "dav1d" %}
-{% set version = "1.0.0" %}
+{% set version = "1.1.0" %}
 # library version is different from project version
 # Check 'meson.build' upstream in every release!
 {% set so_name = "6.6.0" %}
@@ -11,17 +11,14 @@ package:
 
 source:
   url: https://code.videolan.org/videolan/dav1d/-/archive/{{ version }}/dav1d-{{ version }}.tar.gz
-  sha256: 047b8229511a82b5718a1d34c86c067b078efd02f602986d2ed09b23182ec136
+  sha256: b163791a587c083803a3db2cd18b4fbaf7fb865b47d038c4869ffef7722b6b16
 
 build:
-  number: 1
+  number: 0
   script:
     - set -ex
     - >
-        meson setup _build
-        ${MESON_ARGS:---prefix=${PREFIX} --libdir=lib}  # [unix]
-        --prefix=%LIBRARY_PREFIX%  # [win]
-        --buildtype=release -Denable_tests=false
+      meson setup _build ${MESON_ARGS__###conda-selector###__unix:---prefix=${PREFIX} --libdir=lib}   --prefix=%LIBRARY_PREFIX%  # [win] --buildtype=release -Denable_tests=false
     - meson compile -C _build
     - meson install -C _build --no-rebuild
   run_exports:
