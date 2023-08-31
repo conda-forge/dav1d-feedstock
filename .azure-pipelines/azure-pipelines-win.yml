@@ -37,7 +37,7 @@ jobs:
 
     - script: |
         call activate base
-        mamba.exe install "python=3.10" conda pip conda-build conda-libmamba-solver conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
+        mamba.exe install "python=3.10" "conda=23.7.3" pip conda-build "conda-libmamba-solver=23.7.0" conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
       displayName: Install conda-build
 
     - script: set PYTHONUNBUFFERED=1
