@@ -1,7 +1,5 @@
 @echo on
 
-exit 1
-
 meson setup builddir           ^
     %MESON_ARGS%               ^
     --prefix=%LIBRARY_PREFIX%  ^
