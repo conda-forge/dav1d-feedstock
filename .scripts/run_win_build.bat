@@ -21,8 +21,6 @@ echo "Installing dependencies"
 mamba.exe install "python=3.10" conda-build conda pip boa conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
 if errorlevel 1 exit 1
 
-:: Allow overrides of upstream conda-forge-ci-setup
-
 :: Set basic configuration
 echo "Setting up configuration"
 setup_conda_rc .\ ".\recipe" .\.ci_support\%CONFIG%.yaml
