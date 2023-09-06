@@ -93,28 +93,23 @@ exit
 
 :start_group
 if /i "%CI%" == "github_actions" (
-    echo "::group::%~1"
+    echo ::group::%~1
+    exit /b
 )
-else (
-    if /i "%CI%" == "azure" (
-        echo "##[group]%~1"
-    )
-    else (
-        echo %~1
-    )
+if /i "%CI%" == "azure" (
+    echo ##[group]%~1
+    exit /b
 )
+echo %~1
 exit /b
 
 :end_group
 if /i "%CI%" == "github_actions" (
-    echo "::endgroup::"
+    echo ::endgroup::
+    exit /b
 )
-else (
-    if /i "%CI%" == "azure" (
-        echo "##[endgroup]"
-    )
-    else (
-        echo %~1
-    )
+if /i "%CI%" == "azure" (
+    echo ##[endgroup]
+    exit /b
 )
 exit /b
