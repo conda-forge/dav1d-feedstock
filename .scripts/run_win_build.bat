@@ -20,7 +20,7 @@ call activate base
 
 :: Provision the necessary dependencies to build the recipe later
 echo Installing dependencies
-mamba.exe install "python=3.10" conda-build conda pip boa conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
+mamba.exe install "python=3.10" conda pip conda-build conda-libmamba-solver conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
 if errorlevel 1 exit 1
 
 :: Set basic configuration
@@ -45,7 +45,8 @@ call :end_group
 
 :: Build the recipe
 echo Building recipe
-conda.exe mambabuild "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
+set "CONDA_SOLVER=libmamba"
+conda.exe build "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
 if errorlevel 1 exit 1
 
 :: Prepare some environment variables for the upload step
@@ -67,7 +68,7 @@ if /i "%CI%" == "azure" (
     ) else (
         set "IS_PR_BUILD=False"
     )
-    set "TEMP=$(UPLOAD_TEMP)"
+    set "TEMP=%UPLOAD_TEMP%"
 )
 
 :: Validate
