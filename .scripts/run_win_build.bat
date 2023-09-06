@@ -13,34 +13,38 @@
 
 setlocal enableextensions enabledelayedexpansion
 
+call :start_group "Configuring conda"
+
 :: Activate the base conda environment
 call activate base
 
 :: Provision the necessary dependencies to build the recipe later
-echo "Installing dependencies"
+echo Installing dependencies
 mamba.exe install "python=3.10" conda-build conda pip boa conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
 if errorlevel 1 exit 1
 
 :: Set basic configuration
-echo "Setting up configuration"
+echo Setting up configuration
 setup_conda_rc .\ ".\recipe" .\.ci_support\%CONFIG%.yaml
 if errorlevel 1 exit 1
-echo "Running build setup"
+echo Running build setup
 CALL run_conda_forge_build_setup
 
 
 if errorlevel 1 exit 1
 
 if EXIST LICENSE.txt (
-    echo "Copying feedstock license"
+    echo Copying feedstock license
     copy LICENSE.txt "recipe\\recipe-scripts-license.txt"
 )
 if NOT [%HOST_PLATFORM%] == [%BUILD_PLATFORM%] (
     set "EXTRA_CB_OPTIONS=%EXTRA_CB_OPTIONS% --no-test"
 )
 
+call :end_group
+
 :: Build the recipe
-echo "Building recipe"
+echo Building recipe
 conda.exe mambabuild "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
 if errorlevel 1 exit 1
 
@@ -67,16 +71,50 @@ if /i "%CI%" == "azure" (
 )
 
 :: Validate
-echo "Validating recipe outputs"
+call :start_group "Validating outputs"
 validate_recipe_outputs "%FEEDSTOCK_NAME%"
 if errorlevel 1 exit 1
+call :end_group
 
 if /i "%UPLOAD_PACKAGES%" == "true" (
     if /i "%IS_PR_BUILD%" == "false" (
+        call :start_group "Uploading packages"
         if not exist "%TEMP%\" md "%TEMP%"
         set "TMP=%TEMP%"
-        echo "Uploading packages"
         upload_package --validate --feedstock-name="%FEEDSTOCK_NAME%" .\ ".\recipe" .ci_support\%CONFIG%.yaml
         if errorlevel 1 exit 1
+        call :end_group
     )
 )
+
+exit
+
+:: Logging subroutines
+
+:start_group
+if /i "%CI%" == "github_actions" (
+    echo "::group::%~1"
+)
+else (
+    if /i "%CI%" == "azure" (
+        echo "##[group]%~1"
+    )
+    else (
+        echo %~1
+    )
+)
+exit /b
+
+:end_group
+if /i "%CI%" == "github_actions" (
+    echo "::endgroup::"
+)
+else (
+    if /i "%CI%" == "azure" (
+        echo "##[endgroup]"
+    )
+    else (
+        echo %~1
+    )
+)
+exit /b
