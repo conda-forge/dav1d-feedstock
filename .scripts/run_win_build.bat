@@ -17,20 +17,24 @@ setlocal enableextensions enabledelayedexpansion
 call activate base
 
 :: Provision the necessary dependencies to build the recipe later
+echo "Installing dependencies"
 mamba.exe install "python=3.10" conda-build conda pip boa conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
 if errorlevel 1 exit 1
 
 :: Allow overrides of upstream conda-forge-ci-setup
 
 :: Set basic configuration
+echo "Setting up configuration"
 setup_conda_rc .\ ".\recipe" .\.ci_support\%CONFIG%.yaml
 if errorlevel 1 exit 1
+echo "Running build setup"
+CALL run_conda_forge_build_setup
 
-run_conda_forge_build_setup
 
-
+if errorlevel 1 exit 1
 
 if EXIST LICENSE.txt (
+    echo "Copying feedstock license"
     copy LICENSE.txt "recipe\\recipe-scripts-license.txt"
 )
 if NOT [%HOST_PLATFORM%] == [%BUILD_PLATFORM%] (
@@ -38,6 +42,7 @@ if NOT [%HOST_PLATFORM%] == [%BUILD_PLATFORM%] (
 )
 
 :: Build the recipe
+echo "Building recipe"
 conda.exe mambabuild "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
 if errorlevel 1 exit 1
 
@@ -64,6 +69,7 @@ if /i "%CI%" == "azure" (
 )
 
 :: Validate
+echo "Validating recipe outputs"
 validate_recipe_outputs "%FEEDSTOCK_NAME%"
 if errorlevel 1 exit 1
 
@@ -71,6 +77,7 @@ if /i "%UPLOAD_PACKAGES%" == "true" (
     if /i "%IS_PR_BUILD%" == "false" (
         if not exist "%TEMP%\" md "%TEMP%"
         set "TMP=%TEMP%"
+        echo "Uploading packages"
         upload_package --validate --feedstock-name="%FEEDSTOCK_NAME%" .\ ".\recipe" .ci_support\%CONFIG%.yaml
         if errorlevel 1 exit 1
     )
