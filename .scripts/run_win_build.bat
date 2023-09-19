@@ -20,6 +20,7 @@ call activate base
 :: Configure the solver
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!
+set "CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1"
 
 :: Provision the necessary dependencies to build the recipe later
 echo Installing dependencies

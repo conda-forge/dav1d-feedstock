@@ -31,6 +31,7 @@ pkgs_dirs:
 solver: libmamba
 
 CONDARC
+export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
 conda install --update-specs --yes --quiet --channel conda-forge \
     pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
