@@ -34,7 +34,7 @@ CONDARC
 conda install --update-specs --yes --quiet --channel conda-forge \
     pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
 conda update --update-specs --yes --quiet --channel conda-forge \
-    pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
+    pip conda conda-libmamba-solver conda-build conda-forge-ci-setup
 
 # set up the condarc
 setup_conda_rc "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"

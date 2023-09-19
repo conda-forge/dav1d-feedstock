@@ -26,7 +26,7 @@ conda activate base
 conda install --update-specs --quiet --yes --channel conda-forge \
     pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
 conda update --update-specs --yes --quiet --channel conda-forge \
-    pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
+    pip conda conda-libmamba-solver conda-build conda-forge-ci-setup
 
 
 
