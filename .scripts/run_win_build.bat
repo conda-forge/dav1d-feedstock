@@ -20,18 +20,18 @@ call activate base
 
 :: Provision the necessary dependencies to build the recipe later
 echo Installing dependencies
-mamba.exe install "python=3.10" conda pip conda-build conda-libmamba-solver conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
-if errorlevel 1 exit 1
+mamba.exe install "python=3.10" pip mamba conda-build boa conda-forge-ci-setup=3 -c conda-forge --strict-channel-priority --yes
+if !errorlevel! neq 0 exit /b !errorlevel!
 
 :: Set basic configuration
 echo Setting up configuration
 setup_conda_rc .\ ".\recipe" .\.ci_support\%CONFIG%.yaml
-if errorlevel 1 exit 1
+if !errorlevel! neq 0 exit /b !errorlevel!
 echo Running build setup
 CALL run_conda_forge_build_setup
 
 
-if errorlevel 1 exit 1
+if !errorlevel! neq 0 exit /b !errorlevel!
 
 if EXIST LICENSE.txt (
     echo Copying feedstock license
@@ -45,9 +45,8 @@ call :end_group
 
 :: Build the recipe
 echo Building recipe
-set "CONDA_SOLVER=libmamba"
-conda.exe build "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
-if errorlevel 1 exit 1
+conda.exe mambabuild "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
+if !errorlevel! neq 0 exit /b !errorlevel!
 
 :: Prepare some environment variables for the upload step
 if /i "%CI%" == "github_actions" (
@@ -74,7 +73,7 @@ if /i "%CI%" == "azure" (
 :: Validate
 call :start_group "Validating outputs"
 validate_recipe_outputs "%FEEDSTOCK_NAME%"
-if errorlevel 1 exit 1
+if !errorlevel! neq 0 exit /b !errorlevel!
 call :end_group
 
 if /i "%UPLOAD_PACKAGES%" == "true" (
@@ -83,7 +82,7 @@ if /i "%UPLOAD_PACKAGES%" == "true" (
         if not exist "%TEMP%\" md "%TEMP%"
         set "TMP=%TEMP%"
         upload_package --validate --feedstock-name="%FEEDSTOCK_NAME%" .\ ".\recipe" .ci_support\%CONFIG%.yaml
-        if errorlevel 1 exit 1
+        if !errorlevel! neq 0 exit /b !errorlevel!
         call :end_group
     )
 )
