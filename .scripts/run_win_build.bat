@@ -17,6 +17,9 @@ call :start_group "Configuring conda"
 
 :: Activate the base conda environment
 call activate base
+:: Configure the solver
+set "CONDA_SOLVER=libmamba"
+if !errorlevel! neq 0 exit /b !errorlevel!
 
 :: Provision the necessary dependencies to build the recipe later
 echo Installing dependencies

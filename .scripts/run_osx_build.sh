@@ -22,6 +22,7 @@ bash $MINIFORGE_FILE -b -p ${MINIFORGE_HOME}
 
 source ${MINIFORGE_HOME}/etc/profile.d/conda.sh
 conda activate base
+export CONDA_SOLVER="libmamba"
 
 conda install --update-specs --quiet --yes --channel conda-forge \
     pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
