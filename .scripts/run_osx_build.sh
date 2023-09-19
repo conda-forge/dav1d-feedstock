@@ -23,10 +23,10 @@ bash $MINIFORGE_FILE -b -p ${MINIFORGE_HOME}
 source ${MINIFORGE_HOME}/etc/profile.d/conda.sh
 conda activate base
 
-mamba install --update-specs --quiet --yes --channel conda-forge \
-    pip mamba conda-build boa conda-forge-ci-setup=3
-mamba update --update-specs --yes --quiet --channel conda-forge \
-    pip mamba conda-build boa conda-forge-ci-setup=3
+conda install --update-specs --quiet --yes --channel conda-forge \
+    pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
+conda update --update-specs --yes --quiet --channel conda-forge \
+    pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
 
 
 
@@ -75,7 +75,7 @@ else
         EXTRA_CB_OPTIONS="${EXTRA_CB_OPTIONS:-} --no-test"
     fi
 
-    conda mambabuild ./recipe -m ./.ci_support/${CONFIG}.yaml \
+    conda build ./recipe -m ./.ci_support/${CONFIG}.yaml \
         --suppress-variables ${EXTRA_CB_OPTIONS:-} \
         --clobber-file ./.ci_support/clobber_${CONFIG}.yaml
     ( startgroup "Validating outputs" ) 2> /dev/null
