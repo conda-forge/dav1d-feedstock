@@ -10,6 +10,6 @@ provider:
 test: native_and_emulated
 conda_build:
   pkg_format: '2'
-conda_solver: libmamba
-conda_build_tool: conda-build
-conda_install_tool: conda
+# conda_solver: libmamba
+# conda_build_tool: conda-build
+# conda_install_tool: conda
