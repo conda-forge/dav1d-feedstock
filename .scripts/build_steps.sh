@@ -33,9 +33,9 @@ solver: libmamba
 CONDARC
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
-conda install --update-specs --yes --quiet --channel conda-forge \
+conda install --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
     pip conda conda-libmamba-solver conda-build conda-forge-ci-setup=3
-conda update --update-specs --yes --quiet --channel conda-forge \
+conda update --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
     pip conda conda-libmamba-solver conda-build conda-forge-ci-setup
 
 # set up the condarc
