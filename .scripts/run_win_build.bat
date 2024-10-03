@@ -13,18 +13,28 @@
 
 setlocal enableextensions enabledelayedexpansion
 
+if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
+( startgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
+set "MINIFORGE_URL=https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe"
+set "MINIFORGE_EXE=Miniforge3-Windows-x86_64.exe"
+echo Downloading Miniforge
+certutil -urlcache -split -f "%MINIFORGE_URL%" "%MINIFORGE_EXE%"
+if errorlevel 1 exit 1
+echo Installing Miniforge
+start /wait "" %MINIFORGE_EXE% /InstallationType=JustMe /RegisterPython=0 /S /D=%MINIFORGE_HOME%
+( endgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
+
 call :start_group "Configuring conda"
 
 :: Activate the base conda environment
-call activate base
+call %MINIFORGE_HOME%\Scripts\activate.bat
 :: Configure the solver
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!
 set "CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1"
-
 :: Provision the necessary dependencies to build the recipe later
 echo Installing dependencies
-mamba.exe install pip mamba conda-build conda-forge-ci-setup=4 "conda-build>=24.1" -c conda-forge --strict-channel-priority --yes
+mamba.exe install pip mamba python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1" -c conda-forge --strict-channel-priority --yes
 if !errorlevel! neq 0 exit /b !errorlevel!
 
 :: Set basic configuration
