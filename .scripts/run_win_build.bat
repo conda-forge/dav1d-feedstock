@@ -15,6 +15,7 @@ setlocal enableextensions enabledelayedexpansion
 
 if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
 call :start_group "Provisioning base env with micromamba"
+if "%MAMBA_ROOT_PREFIX%"=="" set "MAMBA_ROOT_PREFIX=%USERPROFILE%\.conda"
 set "MICROMAMBA_VERSION=1.5.10-0"
 set "MICROMAMBA_URL=https://github.com/mamba-org/micromamba-releases/releases/download/%MICROMAMBA_VERSION%/micromamba-win-64"
 set "MICROMAMBA_TMPDIR=%TMP%\micromamba-%RANDOM%"
@@ -26,7 +27,7 @@ certutil -urlcache -split -f "%MICROMAMBA_URL%" "%MICROMAMBA_EXE%"
 if errorlevel 1 exit 1
 
 echo Creating environment
-call "%MICROMAMBA_EXE%" create --yes --root-prefix "%USERPROFILE%\.conda" --prefix "%MINIFORGE_HOME%" ^
+call "%MICROMAMBA_EXE%" create --yes --root-prefix "%MAMBA_ROOT_PREFIX%" --prefix "%MINIFORGE_HOME%" ^
     --channel conda-forge ^
     pip python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
 if errorlevel 1 exit 1
