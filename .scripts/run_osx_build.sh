@@ -7,15 +7,21 @@ source .scripts/logging_utils.sh
 set -xe
 
 MINIFORGE_HOME=${MINIFORGE_HOME:-${HOME}/miniforge3}
-( startgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
 
-MINIFORGE_URL="https://github.com/conda-forge/miniforge/releases/latest/download"
-MINIFORGE_FILE="Miniforge3-MacOSX-$(uname -m).sh"
-curl -L -O "${MINIFORGE_URL}/${MINIFORGE_FILE}"
-rm -rf ${MINIFORGE_HOME}
-bash $MINIFORGE_FILE -b -p ${MINIFORGE_HOME}
+( startgroup "Provisioning base env with micromamba" ) 2> /dev/null
+MICROMAMBA_VERSION="1.5.10-0"
+MICROMAMBA_URL="https://github.com/mamba-org/micromamba-releases/releases/download/${MICROMAMBA_VERSION}/micromamba-osx-64"
 
-( endgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
+echo "Downloading micromamba ${MICROMAMBA_VERSION}"
+micromamba_exe="$(mktemp -d)/micromamba"
+curl -L -o "${micromamba_exe}" "${MICROMAMBA_URL}"
+chmod +x "${micromamba_exe}"
+echo "Creating environment"
+"${micromamba_exe}" create --yes --root-prefix ${HOME}/.conda --prefix "${MINIFORGE_ROOT}" \
+  --channel conda-forge \
+  pip python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
+
+( endgroup "Provisioning base env with micromamba" ) 2> /dev/null
 
 ( startgroup "Configuring conda" ) 2> /dev/null
 
@@ -24,8 +30,7 @@ conda activate base
 export CONDA_SOLVER="libmamba"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
-mamba install --update-specs --quiet --yes --channel conda-forge --strict-channel-priority \
-    pip mamba python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
+
 
 
 

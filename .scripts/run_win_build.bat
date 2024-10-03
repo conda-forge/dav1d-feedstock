@@ -14,15 +14,23 @@
 setlocal enableextensions enabledelayedexpansion
 
 if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
-( startgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
-set "MINIFORGE_URL=https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe"
-set "MINIFORGE_EXE=Miniforge3-Windows-x86_64.exe"
-echo Downloading Miniforge
-certutil -urlcache -split -f "%MINIFORGE_URL%" "%MINIFORGE_EXE%"
+call :start_group "Provisioning base env with micromamba"
+set "MICROMAMBA_VERSION=1.5.10-0"
+set "MICROMAMBA_URL=https://github.com/mamba-org/micromamba-releases/releases/download/%MICROMAMBA_VERSION%/micromamba-win-64"
+set "MICROMAMBA_TMPDIR=%TMP%\micromamba-%RANDOM%"
+set "MICROMAMBA_EXE=%MICROMAMBA_TMPDIR%\micromamba.exe"
+
+echo Downloading micromamba %MICROMAMBA_VERSION%
+if not exist "%MICROMAMBA_TMPDIR%" mkdir "%MICROMAMBA_TMPDIR%"
+certutil -urlcache -split -f "%MICROMAMBA_URL%" "%MICROMAMBA_EXE%"
 if errorlevel 1 exit 1
-echo Installing Miniforge
-start /wait "" %MINIFORGE_EXE% /InstallationType=JustMe /RegisterPython=0 /S /D=%MINIFORGE_HOME%
-( endgroup "Installing a fresh version of Miniforge" ) 2> /dev/null
+
+echo Creating environment
+call "%MICROMAMBA_EXE%" create --yes --root-prefix "%USERPROFILE%\.conda" --prefix "%MINIFORGE_HOME%" ^
+    --channel conda-forge ^
+    pip python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
+if errorlevel 1 exit 1
+call :end_group
 
 call :start_group "Configuring conda"
 
@@ -32,10 +40,6 @@ call %MINIFORGE_HOME%\Scripts\activate.bat
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!
 set "CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1"
-:: Provision the necessary dependencies to build the recipe later
-echo Installing dependencies
-mamba.exe install pip mamba python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1" -c conda-forge --strict-channel-priority --yes
-if !errorlevel! neq 0 exit /b !errorlevel!
 
 :: Set basic configuration
 echo Setting up configuration
