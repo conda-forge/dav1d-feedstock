@@ -14,8 +14,10 @@
 setlocal enableextensions enabledelayedexpansion
 
 if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
+:: Remove trailing backslash, if present
+if "%MINIFORGE_HOME:~-1%"=="\" set "MINIFORGE_HOME=%MINIFORGE_HOME:~0,-1%"
 call :start_group "Provisioning base env with micromamba"
-if "%MAMBA_ROOT_PREFIX%"=="" set "MAMBA_ROOT_PREFIX=%USERPROFILE%\.conda"
+set "MAMBA_ROOT_PREFIX=%MINIFORGE_HOME%-micromamba-%RANDOM%"
 set "MICROMAMBA_VERSION=1.5.10-0"
 set "MICROMAMBA_URL=https://github.com/mamba-org/micromamba-releases/releases/download/%MICROMAMBA_VERSION%/micromamba-win-64"
 set "MICROMAMBA_TMPDIR=%TMP%\micromamba-%RANDOM%"
@@ -24,13 +26,18 @@ set "MICROMAMBA_EXE=%MICROMAMBA_TMPDIR%\micromamba.exe"
 echo Downloading micromamba %MICROMAMBA_VERSION%
 if not exist "%MICROMAMBA_TMPDIR%" mkdir "%MICROMAMBA_TMPDIR%"
 certutil -urlcache -split -f "%MICROMAMBA_URL%" "%MICROMAMBA_EXE%"
-if errorlevel 1 exit 1
+if !errorlevel! neq 0 exit /b !errorlevel!
 
 echo Creating environment
 call "%MICROMAMBA_EXE%" create --yes --root-prefix "%MAMBA_ROOT_PREFIX%" --prefix "%MINIFORGE_HOME%" ^
     --channel conda-forge ^
     pip python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
-if errorlevel 1 exit 1
+if !errorlevel! neq 0 exit /b !errorlevel!
+echo Moving pkgs cache from %MAMBA_ROOT_PREFIX% to %MINIFORGE_HOME%
+move /Y "%MAMBA_ROOT_PREFIX%\pkgs" "%MINIFORGE_HOME%"
+if !errorlevel! neq 0 exit /b !errorlevel!
+echo Removing %MAMBA_ROOT_PREFIX%
+del /S /Q "%MAMBA_ROOT_PREFIX%"
 call :end_group
 
 call :start_group "Configuring conda"
@@ -74,8 +81,8 @@ conda-build.exe "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTR
 if !errorlevel! neq 0 exit /b !errorlevel!
 
 call :start_group "Inspecting artifacts"
-:: inspect_artifacts was only added in conda-forge-ci-setup 4.6.0
-WHERE inspect_artifacts >nul 2>nul && inspect_artifacts || echo "inspect_artifacts needs conda-forge-ci-setup >=4.6.0"
+:: inspect_artifacts was only added in conda-forge-ci-setup 4.9.4
+WHERE inspect_artifacts >nul 2>nul && inspect_artifacts --recipe-dir ".\recipe" -m .ci_support\%CONFIG%.yaml || echo "inspect_artifacts needs conda-forge-ci-setup >=4.9.4"
 call :end_group
 
 :: Prepare some environment variables for the upload step
