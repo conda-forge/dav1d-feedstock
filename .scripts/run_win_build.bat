@@ -3,8 +3,6 @@
 :: changes to this script, consider a proposal to conda-smithy so that other feedstocks can also
 :: benefit from the improvement.
 
-:: Note: we assume a Miniforge installation is available
-
 :: INPUTS (required environment variables)
 :: CONFIG: name of the .ci_support/*.yaml file for this job
 :: CI: azure, github_actions, or unset
@@ -36,8 +34,6 @@ if !errorlevel! neq 0 exit /b !errorlevel!
 echo Moving pkgs cache from %MAMBA_ROOT_PREFIX% to %MINIFORGE_HOME%
 move /Y "%MAMBA_ROOT_PREFIX%\pkgs" "%MINIFORGE_HOME%"
 if !errorlevel! neq 0 exit /b !errorlevel!
-echo "debug pkgs"
-dir "%MINIFORGE_HOME%\pkgs"
 echo Removing %MAMBA_ROOT_PREFIX%
 del /S /Q "%MAMBA_ROOT_PREFIX%"
 del /S /Q "%MICROMAMBA_TMPDIR%"
@@ -80,7 +76,7 @@ call :end_group
 
 :: Build the recipe
 echo Building recipe
-conda-build.exe --debug "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
+conda-build.exe "recipe" -m .ci_support\%CONFIG%.yaml --suppress-variables %EXTRA_CB_OPTIONS%
 if !errorlevel! neq 0 exit /b !errorlevel!
 
 call :start_group "Inspecting artifacts"

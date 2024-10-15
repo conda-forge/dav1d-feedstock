@@ -30,12 +30,11 @@ echo "Moving pkgs cache from ${MAMBA_ROOT_PREFIX} to ${MINIFORGE_HOME}"
 mv "${MAMBA_ROOT_PREFIX}/pkgs" "${MINIFORGE_HOME}"
 echo "Cleaning up micromamba"
 rm -rf "${MAMBA_ROOT_PREFIX}" "${micromamba_exe}" || true
-ls -alh "${MINIFORGE_HOME}/pkgs"
 ( endgroup "Provisioning base env with micromamba" ) 2> /dev/null
 
 ( startgroup "Configuring conda" ) 2> /dev/null
 
-source ${MINIFORGE_HOME}/etc/profile.d/conda.sh
+source "${MINIFORGE_HOME}/etc/profile.d/conda.sh"
 conda activate base
 export CONDA_SOLVER="libmamba"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
@@ -93,7 +92,7 @@ else
         EXTRA_CB_OPTIONS="${EXTRA_CB_OPTIONS:-} --no-test"
     fi
 
-    conda-build --debug ./recipe -m ./.ci_support/${CONFIG}.yaml \
+    conda-build ./recipe -m ./.ci_support/${CONFIG}.yaml \
         --suppress-variables ${EXTRA_CB_OPTIONS:-} \
         --clobber-file ./.ci_support/clobber_${CONFIG}.yaml \
         --extra-meta flow_run_id="$flow_run_id" remote_url="$remote_url" sha="$sha"
