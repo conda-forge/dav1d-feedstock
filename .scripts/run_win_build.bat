@@ -38,6 +38,7 @@ move /Y "%MAMBA_ROOT_PREFIX%\pkgs" "%MINIFORGE_HOME%"
 if !errorlevel! neq 0 exit /b !errorlevel!
 echo Removing %MAMBA_ROOT_PREFIX%
 del /S /Q "%MAMBA_ROOT_PREFIX%"
+del /S /Q "%MICROMAMBA_TMPDIR%"
 call :end_group
 
 call :start_group "Configuring conda"
