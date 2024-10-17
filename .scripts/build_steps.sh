@@ -31,10 +31,12 @@ pkgs_dirs:
 solver: libmamba
 
 CONDARC
+conda deactivate
+curl -fsSL https://pixi.sh/install.sh | bash
+export PATH="~/.pixi/bin:$PATH"
+pixi --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" install
+eval "$(pixi --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" shell-hook)"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
-
-pixi install --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
-    pip  python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
 
 # set up the condarc
 setup_conda_rc "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"

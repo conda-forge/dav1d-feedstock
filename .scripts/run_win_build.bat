@@ -16,9 +16,11 @@ if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
 :: Remove trailing backslash, if present
 if "%MINIFORGE_HOME:~-1%"=="\" set "MINIFORGE_HOME=%MINIFORGE_HOME:~0,-1%"
 call :start_group "Provisioning base env with pixi"
-@powershell -NoProfile -ExecutionPolicy unrestricted -Command "iwr -useb https://pixi.sh/install.ps1 | iex"
+echo Installing pixi
+powershell -NoProfile -ExecutionPolicy unrestricted -Command "iwr -useb https://pixi.sh/install.ps1 | iex"
 if !errorlevel! neq 0 exit /b !errorlevel!
 set "PATH=%USERPROFILE%\.pixi\bin;%PATH%"
+echo Installing environment
 pixi install
 if !errorlevel! neq 0 exit /b !errorlevel!
 call :end_group
