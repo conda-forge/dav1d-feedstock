@@ -4,7 +4,7 @@
 
 [project]
 name = "dav1d-feedstock"
-version = "2024.10.18.01.03.26"
+version = "3.41.2.dev8+gca99aa5b"
 description = "Pixi configuration for conda-forge/dav1d-feedstock"
 authors = ["@conda-forge/dav1"]
 channels = ["conda-forge"]
