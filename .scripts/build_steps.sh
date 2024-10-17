@@ -33,7 +33,6 @@ solver: libmamba
 CONDARC
 if [[ ! -f /opt/conda/condabin/micromamba ]]; then
     # TEMPORARY: only until https://github.com/conda-forge/docker-images/pull/288 is merged
-    echo "3.10" > /opt/python_version
     export micromamba_version="1.5.10-0"
     if [ "$(uname -m)" = "x86_64" ]; then
         export micromamba_arch="64"
@@ -53,7 +52,7 @@ if [[ ! -f /opt/conda/condabin/micromamba ]]; then
     sha256sum /opt/conda/condabin/micromamba | grep $micromamba_chksum
     chmod +x /opt/conda/condabin/micromamba
 fi
-python_version=$(cat /opt/python_version)
+python_version="3.10"
 micromamba info --root-prefix ~/.conda
 echo > /opt/conda/conda-meta/history
 micromamba install --root-prefix ~/.conda --prefix /opt/conda \
