@@ -31,7 +31,6 @@ pkgs_dirs:
 solver: libmamba
 
 CONDARC
-conda deactivate
 curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
 pixi --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" install
