@@ -32,7 +32,8 @@ solver: libmamba
 
 CONDARC
 if [[ ! -f /opt/conda/condabin/micromamba ]]; then
-    # TEMPORARY: only until the micromamba-enabled Docker images are available
+    # TEMPORARY: only until https://github.com/conda-forge/docker-images/pull/288 is merged
+    echo "3.10" > /opt/python_version
     export micromamba_version="1.5.10-0"
     if [ "$(uname -m)" = "x86_64" ]; then
         export micromamba_arch="64"
