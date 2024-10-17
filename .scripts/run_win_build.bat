@@ -15,29 +15,14 @@ setlocal enableextensions enabledelayedexpansion
 if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
 :: Remove trailing backslash, if present
 if "%MINIFORGE_HOME:~-1%"=="\" set "MINIFORGE_HOME=%MINIFORGE_HOME:~0,-1%"
-call :start_group "Provisioning base env with micromamba"
-set "MAMBA_ROOT_PREFIX=%MINIFORGE_HOME%-micromamba-%RANDOM%"
-set "MICROMAMBA_VERSION=1.5.10-0"
-set "MICROMAMBA_URL=https://github.com/mamba-org/micromamba-releases/releases/download/%MICROMAMBA_VERSION%/micromamba-win-64"
-set "MICROMAMBA_TMPDIR=%TMP%\micromamba-%RANDOM%"
-set "MICROMAMBA_EXE=%MICROMAMBA_TMPDIR%\micromamba.exe"
-
-echo Downloading micromamba %MICROMAMBA_VERSION%
-if not exist "%MICROMAMBA_TMPDIR%" mkdir "%MICROMAMBA_TMPDIR%"
-certutil -urlcache -split -f "%MICROMAMBA_URL%" "%MICROMAMBA_EXE%"
+call :start_group "Installing a fresh version of Miniforge"
+set "MINIFORGE_URL=https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe"
+set "MINIFORGE_EXE=Miniforge3-Windows-x86_64.exe"
+echo Downloading Miniforge
+certutil -urlcache -split -f "%MINIFORGE_URL%" "%MINIFORGE_EXE%"
 if !errorlevel! neq 0 exit /b !errorlevel!
-
-echo Creating environment
-call "%MICROMAMBA_EXE%" create --yes --root-prefix "%MAMBA_ROOT_PREFIX%" --prefix "%MINIFORGE_HOME%" ^
-    --channel conda-forge ^
-    pip python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
-if !errorlevel! neq 0 exit /b !errorlevel!
-echo Moving pkgs cache from %MAMBA_ROOT_PREFIX% to %MINIFORGE_HOME%
-move /Y "%MAMBA_ROOT_PREFIX%\pkgs" "%MINIFORGE_HOME%"
-if !errorlevel! neq 0 exit /b !errorlevel!
-echo Removing %MAMBA_ROOT_PREFIX%
-del /S /Q "%MAMBA_ROOT_PREFIX%"
-del /S /Q "%MICROMAMBA_TMPDIR%"
+echo Installing Miniforge
+start /wait "" %MINIFORGE_EXE% /InstallationType=JustMe /RegisterPython=0 /S /D=%MINIFORGE_HOME%
 call :end_group
 
 call :start_group "Configuring conda"

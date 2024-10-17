@@ -8,34 +8,14 @@ set -xe
 
 MINIFORGE_HOME=${MINIFORGE_HOME:-${HOME}/miniforge3}
 MINIFORGE_HOME=${MINIFORGE_HOME%/} # remove trailing slash
-
-( startgroup "Provisioning base env with micromamba" ) 2> /dev/null
-MICROMAMBA_VERSION="1.5.10-0"
-if [[ "$(uname -m)" == "arm64" ]]; then
-  osx_arch="osx-arm64"
-else
-  osx_arch="osx-64"
-fi
-MICROMAMBA_URL="https://github.com/mamba-org/micromamba-releases/releases/download/${MICROMAMBA_VERSION}/micromamba-${osx_arch}"
-MAMBA_ROOT_PREFIX="${MINIFORGE_HOME}-micromamba-$(date +%s)"
-echo "Downloading micromamba ${MICROMAMBA_VERSION}"
-micromamba_exe="$(mktemp -d)/micromamba"
-curl -L -o "${micromamba_exe}" "${MICROMAMBA_URL}"
-chmod +x "${micromamba_exe}"
-echo "Creating environment"
-"${micromamba_exe}" create --yes --root-prefix "${MAMBA_ROOT_PREFIX}" --prefix "${MINIFORGE_HOME}" \
-  --channel conda-forge \
-  pip python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
-echo "Moving pkgs cache from ${MAMBA_ROOT_PREFIX} to ${MINIFORGE_HOME}"
-mv "${MAMBA_ROOT_PREFIX}/pkgs" "${MINIFORGE_HOME}"
-echo "Cleaning up micromamba"
-rm -rf "${MAMBA_ROOT_PREFIX}" "${micromamba_exe}" || true
-( endgroup "Provisioning base env with micromamba" ) 2> /dev/null
+( startgroup "Provisioning base env with pixi" ) 2> /dev/null
+curl -fsSL https://pixi.sh/install.sh | bash
+export PATH="~/.pixi/bin:$PATH"
+pixi install
+( endgroup "Provisioning base env with pixi" ) 2> /dev/null
 
 ( startgroup "Configuring conda" ) 2> /dev/null
-
-source "${MINIFORGE_HOME}/etc/profile.d/conda.sh"
-conda activate base
+eval "$(pixi shell-hook)"
 export CONDA_SOLVER="libmamba"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
