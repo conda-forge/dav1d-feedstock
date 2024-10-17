@@ -31,12 +31,34 @@ pkgs_dirs:
 solver: libmamba
 
 CONDARC
+if [[ ! -f /opt/conda/condabin/micromamba ]]; then
+    # TEMPORARY: only until the micromamba-enabled Docker images are available
+    export micromamba_version="1.5.10-0"
+    if [ "$(uname -m)" = "x86_64" ]; then
+        export micromamba_arch="64"
+        export micromamba_chksum="80057e007579d482a39dc283dd3e725503e34da7e7c51844957164511cdb917b"
+    elif [ "$(uname -m)" = "ppc64le" ]; then
+        export micromamba_arch="ppc64le"
+        export micromamba_chksum="5528e92b12f7389a8d23a409a476e871f4f889a17e381924cf74459f14627ddd"
+    elif [ "$(uname -m)" = "aarch64" ]; then
+        export micromamba_arch="aarch64"
+        export micromamba_chksum="7803a2aa51a5f0a58f3d2ef0f07724edb67f31f61b3e44ae9b8d6c9f009f7996"
+    else
+        exit 1
+    fi
+    export micromambapkg="https://github.com/mamba-org/micromamba-releases/releases/download/${micromamba_version}/micromamba-linux-${micromamba_arch}"
+    # Download micromamba and put it condabin
+    curl -s -L $micromambapkg > /opt/conda/condabin/micromamba
+    sha256sum /opt/conda/condabin/micromamba | grep $micromamba_chksum
+    chmod +x /opt/conda/condabin/micromamba
+fi
+python_version=$(cat /opt/python_version)
+micromamba info --root-prefix ~/.conda
+echo > /opt/conda/conda-meta/history
+micromamba install --root-prefix ~/.conda --prefix /opt/conda \
+    --yes --override-channels --channel conda-forge --strict-channel-priority \
+    "python=${python_version}" pip  python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
-
-mamba install --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
-    pip  python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
-mamba update --update-specs --yes --quiet --channel conda-forge --strict-channel-priority \
-    pip  python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
 
 # set up the condarc
 setup_conda_rc "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"

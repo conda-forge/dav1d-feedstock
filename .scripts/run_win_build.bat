@@ -6,6 +6,7 @@
 :: INPUTS (required environment variables)
 :: CONFIG: name of the .ci_support/*.yaml file for this job
 :: CI: azure, github_actions, or unset
+:: MINIFORGE_HOME: where to install the base conda environment
 :: UPLOAD_PACKAGES: true or false
 :: UPLOAD_ON_BRANCH: true or false
 
@@ -42,7 +43,7 @@ call :end_group
 call :start_group "Configuring conda"
 
 :: Activate the base conda environment
-call %MINIFORGE_HOME%\Scripts\activate.bat
+call "%MINIFORGE_HOME%\Scripts\activate.bat"
 :: Configure the solver
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!
