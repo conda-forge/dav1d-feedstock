@@ -33,8 +33,8 @@ solver: libmamba
 CONDARC
 curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
-pixi --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" install
-eval "$(pixi --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" shell-hook)"
+pixi install --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" 
+eval "$(pixi shell-hook --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml")"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
 # set up the condarc
