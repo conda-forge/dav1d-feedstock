@@ -18,7 +18,7 @@ if "%MINIFORGE_HOME:~-1%"=="\" set "MINIFORGE_HOME=%MINIFORGE_HOME:~0,-1%"
 call :start_group "Provisioning base env with pixi"
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "iwr -useb https://pixi.sh/install.ps1 | iex"
 if !errorlevel! neq 0 exit /b !errorlevel!
-set PATH="%USERPROFILE%\.pixi\bin;%PATH%"
+set "PATH=%USERPROFILE%\.pixi\bin;%PATH%"
 pixi install
 if !errorlevel! neq 0 exit /b !errorlevel!
 call :end_group
