@@ -52,12 +52,11 @@ if [[ ! -f /opt/conda/condabin/micromamba ]]; then
     sha256sum /opt/conda/condabin/micromamba | grep $micromamba_chksum
     chmod +x /opt/conda/condabin/micromamba
 fi
-python_version="3.10"
 micromamba info --root-prefix ~/.conda
 echo > /opt/conda/conda-meta/history
 micromamba install --root-prefix ~/.conda --prefix /opt/conda \
     --yes --override-channels --channel conda-forge --strict-channel-priority \
-    "python=${python_version}" pip  python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
+    pip  python=3.12 conda-build conda-forge-ci-setup=4 "conda-build>=24.1"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
 # set up the condarc
