@@ -33,20 +33,26 @@ if "%PIXI_CACHE_DIR%"=="%MINIFORGE_HOME%" (
 ) else (
     pushd "%REPO_ROOT%"
 )
+ren pixi.toml pixi.toml.bak
+set "arch=64"
+if "%PROCESSOR_ARCHITECTURE%"=="ARM64" set "arch=arm64"
+powershell -NoProfile -ExecutionPolicy unrestricted -Command "(Get-Content pixi.toml.bak) -replace 'platforms = .*', 'platforms = [\'win-%arch%\']' | Out-File pixi.toml"
 pixi install
 if !errorlevel! neq 0 exit /b !errorlevel!
 pixi list
 if !errorlevel! neq 0 exit /b !errorlevel!
+set "ACTIVATE_PIXI=%TMP%\pixi-activate-%RANDOM%.bat"
+pixi shell-hook > "%ACTIVATE_PIXI%"
+if !errorlevel! neq 0 exit /b !errorlevel!
+call "%ACTIVATE_PIXI%"
+if !errorlevel! neq 0 exit /b !errorlevel!
+ren pixi.toml.bak pixi.toml
 popd
 call :end_group
 
 call :start_group "Configuring conda"
 
 :: Activate the base conda environment
-echo Activating environment
-set "ACTIVATE_PIXI=%TMP%\pixi-activate-%RANDOM%.bat"
-pixi shell-hook --manifest-path "%MINIFORGE_HOME%\pixi.toml" > "%ACTIVATE_PIXI%"
-call "%ACTIVATE_PIXI%"
 :: Configure the solver
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!

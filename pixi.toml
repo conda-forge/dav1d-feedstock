@@ -8,13 +8,7 @@ version = "3.41.2.dev8+gca99aa5b"
 description = "Pixi configuration for conda-forge/dav1d-feedstock"
 authors = ["@conda-forge/dav1"]
 channels = ["conda-forge"]
-platforms = [
-    "linux-64",
-    "linux-aarch64",
-    "linux-ppc64le",
-    "osx-64",
-    "win-64",
-]
+platforms = ['linux-64', 'linux-aarch64', 'linux-ppc64le', 'osx-64', 'win-64']
 
 [dependencies]
 conda-build = ">=24.1"
