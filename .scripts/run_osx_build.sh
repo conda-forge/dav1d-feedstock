@@ -15,7 +15,7 @@ arch=$(uname -m)
 if [[ "$arch" == "x86_64" ]]; then
   arch="64"
 fi
-sed -i.bak "s/platforms = .*/platforms = [\"linux-${arch}\"]/" pixi.toml
+sed -i.bak "s/platforms = .*/platforms = [\"osx-${arch}\"]/" pixi.toml
 echo "Creating environment"
 pixi install
 pixi list
