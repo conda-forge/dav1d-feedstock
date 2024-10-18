@@ -35,10 +35,6 @@ curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
 pushd "${FEEDSTOCK_ROOT}"
 echo "Creating environment"
-arch=$(uname -m)
-if [[ "$arch" == "x86_64" ]]; then
-  arch="64"
-fi
 PIXI_CACHE_DIR=/opt/conda pixi install
 pixi list
 echo "Activating environment"

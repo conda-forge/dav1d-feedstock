@@ -11,8 +11,9 @@
 :: UPLOAD_ON_BRANCH: true or false
 
 setlocal enableextensions enabledelayedexpansion
-
-if "%MINIFORGE_HOME%"=="" set "MINIFORGE_HOME=%USERPROFILE%\Miniforge3"
+if "%MINIFORGE_HOME%"=="" (
+    FOR %%A IN ("%~dp0.") DO SET "MINIFORGE_HOME=%%~dpA"
+)
 :: Remove trailing backslash, if present
 if "%MINIFORGE_HOME:~-1%"=="\" set "MINIFORGE_HOME=%MINIFORGE_HOME:~0,-1%"
 call :start_group "Provisioning base env with pixi"
@@ -21,10 +22,15 @@ powershell -NoProfile -ExecutionPolicy unrestricted -Command "iwr -useb https://
 if !errorlevel! neq 0 exit /b !errorlevel!
 set "PATH=%USERPROFILE%\.pixi\bin;%PATH%"
 echo Installing environment
+mkdir "%MINIFORGE_HOME%"
+copy pixi.toml "%MINIFORGE_HOME%"
+pushd "%MINIFORGE_HOME%"
+set "PIXI_CACHE_DIR=%MINIFORGE_HOME%"
 pixi install
 if !errorlevel! neq 0 exit /b !errorlevel!
 pixi list
 if !errorlevel! neq 0 exit /b !errorlevel!
+popd
 call :end_group
 
 call :start_group "Configuring conda"
@@ -32,8 +38,8 @@ call :start_group "Configuring conda"
 :: Activate the base conda environment
 echo Activating environment
 set "ACTIVATE_PIXI=%TMP%\pixi-activate-%RANDOM%.bat"
-pixi shell-hook > %ACTIVATE_PIXI%
-call %ACTIVATE_PIXI%
+pixi shell-hook --manifest-path "%MINIFORGE_HOME%\pixi.toml" > "%ACTIVATE_PIXI%"
+call "%ACTIVATE_PIXI%"
 :: Configure the solver
 set "CONDA_SOLVER=libmamba"
 if !errorlevel! neq 0 exit /b !errorlevel!

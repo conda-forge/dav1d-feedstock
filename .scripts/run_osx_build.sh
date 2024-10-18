@@ -11,10 +11,6 @@ MINIFORGE_HOME=${MINIFORGE_HOME%/} # remove trailing slash
 ( startgroup "Provisioning base env with pixi" ) 2> /dev/null
 curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
-arch=$(uname -m)
-if [[ "$arch" == "x86_64" ]]; then
-  arch="64"
-fi
 pixi install
 pixi list
 ( endgroup "Provisioning base env with pixi" ) 2> /dev/null
