@@ -11,8 +11,12 @@
 :: UPLOAD_ON_BRANCH: true or false
 
 setlocal enableextensions enabledelayedexpansion
+
+FOR %%A IN ("%~dp0.") DO SET "REPO_ROOT=%%~dpA"
 if "%MINIFORGE_HOME%"=="" (
-    FOR %%A IN ("%~dp0.") DO SET "MINIFORGE_HOME=%%~dpA"
+    set "MINIFORGE_HOME=%REPO_ROOT%\.pixi\envs\default"
+) else (
+    set "PIXI_CACHE_DIR=%MINIFORGE_HOME%"
 )
 :: Remove trailing backslash, if present
 if "%MINIFORGE_HOME:~-1%"=="\" set "MINIFORGE_HOME=%MINIFORGE_HOME:~0,-1%"
@@ -22,10 +26,13 @@ powershell -NoProfile -ExecutionPolicy unrestricted -Command "iwr -useb https://
 if !errorlevel! neq 0 exit /b !errorlevel!
 set "PATH=%USERPROFILE%\.pixi\bin;%PATH%"
 echo Installing environment
-mkdir "%MINIFORGE_HOME%"
-copy pixi.toml "%MINIFORGE_HOME%"
-pushd "%MINIFORGE_HOME%"
-set "PIXI_CACHE_DIR=%MINIFORGE_HOME%"
+if "%PIXI_CACHE_DIR%"=="%MINIFORGE_HOME%" (
+    mkdir "%MINIFORGE_HOME%"
+    copy /Y pixi.toml "%MINIFORGE_HOME%"
+    pushd "%MINIFORGE_HOME%"
+) else (
+    pushd "%REPO_ROOT%"
+)
 pixi install
 if !errorlevel! neq 0 exit /b !errorlevel!
 pixi list
