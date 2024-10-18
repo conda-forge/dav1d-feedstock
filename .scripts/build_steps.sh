@@ -33,8 +33,13 @@ solver: libmamba
 CONDARC
 curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
-pixi install --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml" 
-eval "$(pixi shell-hook --manifest-path "${FEEDSTOCK_ROOT}/pixi.toml")"
+pushd "${FEEDSTOCK_ROOT}"
+ln -s /opt/conda/pkgs/cache /opt/conda/repodata
+echo "Creating environment"
+PIXI_CACHE_DIR=/opt/conda pixi install
+pixi list
+echo "Activating environment"
+eval "$(pixi shell-hook)"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
 
 # set up the condarc

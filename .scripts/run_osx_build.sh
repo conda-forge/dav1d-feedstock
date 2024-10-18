@@ -12,6 +12,7 @@ MINIFORGE_HOME=${MINIFORGE_HOME%/} # remove trailing slash
 curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
 pixi install
+pixi list
 ( endgroup "Provisioning base env with pixi" ) 2> /dev/null
 
 ( startgroup "Configuring conda" ) 2> /dev/null

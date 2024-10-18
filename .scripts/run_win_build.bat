@@ -23,11 +23,14 @@ set "PATH=%USERPROFILE%\.pixi\bin;%PATH%"
 echo Installing environment
 pixi install
 if !errorlevel! neq 0 exit /b !errorlevel!
+pixi list
+if !errorlevel! neq 0 exit /b !errorlevel!
 call :end_group
 
 call :start_group "Configuring conda"
 
 :: Activate the base conda environment
+echo Activating environment
 set "ACTIVATE_PIXI=%TMP%\pixi-activate-%RANDOM%.bat"
 pixi shell-hook > %ACTIVATE_PIXI%
 call %ACTIVATE_PIXI%
