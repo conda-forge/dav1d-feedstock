@@ -34,10 +34,15 @@ CONDARC
 curl -fsSL https://pixi.sh/install.sh | bash
 export PATH="~/.pixi/bin:$PATH"
 pushd "${FEEDSTOCK_ROOT}"
-ln -s /opt/conda/pkgs/cache /opt/conda/repodata
 echo "Creating environment"
+arch=$(uname -m)
+if [[ "$arch" == "x86_64" ]]; then
+  arch="64"
+fi
+sed -i.bak "s/platforms = .*/platforms = [\"linux-${arch}\"]/" pixi.toml
 PIXI_CACHE_DIR=/opt/conda pixi install
 pixi list
+mv pixi.toml.bak pixi.toml
 echo "Activating environment"
 eval "$(pixi shell-hook)"
 export CONDA_LIBMAMBA_SOLVER_NO_CHANNELS_FROM_INSTALLED=1
