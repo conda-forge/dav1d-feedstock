@@ -29,7 +29,21 @@ outputs:
 
   # Everything needed to build against libdav1d (excludes binary)
   - name: dav1d-dev
-    script: install.py
+    files:
+      include:
+        - "include/**/*"
+        - "lib/**/*"
+      exclude:
+        # versioned libs
+        - "lib/lib*.*.dylib"
+        - "lib/lib*.so.*"
+        # static libs
+        - "lib/lib*.a"
+        - "lib/lib*.lib"
+        - "lib/*.a.lib"
+        - "lib/*_a.lib"
+        - "lib/*static.lib"
+        - "lib/**/*static*"
     build:
       run_exports:
         - {{ pin_subpackage('libdav1d' ~ so_name_major) }}
@@ -59,7 +73,13 @@ outputs:
 
   # Everything needed to run the dav1d binary
   - name: dav1d
-    script: install.py
+    files:
+      include:
+        - "bin/**/*"
+        - "doc/**/*"
+        - "share/**/*"
+      exclude:
+        - "bin/*.dll"  # [win]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -86,7 +106,11 @@ outputs:
 
   # Only what's needed for run_exports downstream
   - name: libdav1d{{ so_name_major }}
-    script: install.py
+    files:
+      include:
+        - "bin/*.dll"  # [win]
+        - "lib/lib*.*.dylib"  # [osx]
+        - "lib/lib*.so.*"  # [linux]
     build:
       run_exports:
         - {{ pin_subpackage('libdav1d' ~ so_name_major) }}
