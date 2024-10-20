@@ -5,8 +5,7 @@ mkdir $SRC_DIR/stage
 meson setup builddir          \
     ${MESON_ARGS}             \
     --prefix=$SRC_DIR/stage   \
-    -Denable_tests=false      \
-    --buildtype=release
+    -Denable_tests=false
 
 meson compile -C builddir
 

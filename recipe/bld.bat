@@ -6,8 +6,7 @@ if errorlevel 1 exit 1
 meson setup builddir           ^
     %MESON_ARGS%               ^
     --prefix=%SRC_DIR%\stage   ^
-    -Denable_tests=false       ^
-    --buildtype=release
+    -Denable_tests=false
 if errorlevel 1 exit 1
 
 meson compile -C builddir
