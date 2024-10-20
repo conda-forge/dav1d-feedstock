@@ -8,5 +8,5 @@ if errorlevel 1 exit 1
 meson compile -C builddir
 if errorlevel 1 exit 1
 
-meson install -C builddir --no-rebuild
+meson install -C builddir --no-rebuild --strip
 if errorlevel 1 exit 1

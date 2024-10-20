@@ -6,4 +6,4 @@ meson setup builddir          \
 
 meson compile -C builddir
 
-meson install -C builddir --no-rebuild
+meson install -C builddir --no-rebuild --strip
