@@ -2,7 +2,9 @@
 
 meson setup builddir           ^
     %MESON_ARGS%               ^
-    -Denable_tests=false
+    --prefix=%LIBRARY_PREFIX%  ^
+    -Denable_tests=false       ^
+    --buildtype=release
 if errorlevel 1 exit 1
 
 meson compile -C builddir
