@@ -31,19 +31,20 @@ outputs:
   - name: dav1d-dev
     files:
       include:
-        - "include/**/*"
-        - "lib/**/*"
+        - "include/**/*"  # [unix]
+        - "lib/**/*"      # [unix] 
+        - "Library/include/**/*"  # [win]
+        - "Library/lib/**/*"      # [win] 
       exclude:
         # versioned libs
-        - "lib/lib*.*.dylib"
-        - "lib/lib*.so.*"
+        - "lib/lib*.*.dylib"  # [osx]
+        - "lib/lib*.so.*"  # [linux]
         # static libs
-        - "lib/lib*.a"
-        - "lib/lib*.lib"
-        - "lib/*.a.lib"
-        - "lib/*_a.lib"
-        - "lib/*static.lib"
-        - "lib/**/*static*"
+        - "lib/lib*.a"  # [unix]
+        - "Library/lib/*.a.lib"  # [win]
+        - "Library/lib/*_a.lib"  # [win]
+        - "Library/lib/*static.lib"  # [win]
+        - "lib/**/*static*"  # [win]
     build:
       run_exports:
         - {{ pin_subpackage('libdav1d' ~ so_name_major) }}
@@ -75,11 +76,14 @@ outputs:
   - name: dav1d
     files:
       include:
-        - "bin/**/*"
-        - "doc/**/*"
-        - "share/**/*"
+        - "bin/**/*"  # [unix]
+        - "doc/**/*"  # [unix]
+        - "share/**/*"  # [unix]
+        - "Library/bin/**/*"  # [win]
+        - "Library/doc/**/*"  # [win]
+        - "Library/share/**/*"  # [win]
       exclude:
-        - "bin/*.dll"  # [win]
+        - "Library/bin/*.dll"  # [win]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -108,7 +112,7 @@ outputs:
   - name: libdav1d{{ so_name_major }}
     files:
       include:
-        - "bin/*.dll"  # [win]
+        - "Library/bin/*.dll"  # [win]
         - "lib/lib*.*.dylib"  # [osx]
         - "lib/lib*.so.*"  # [linux]
     build:
