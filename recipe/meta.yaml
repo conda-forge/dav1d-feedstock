@@ -1,4 +1,4 @@
-{% set version = "1.4.3" %}
+{% set version = "1.5.0" %}
 # library version is different from project version
 # Check 'meson.build' upstream in every release!
 {% set so_name = "7.0.0" %}
@@ -10,7 +10,7 @@ package:
 
 source:
   url: https://code.videolan.org/videolan/dav1d/-/archive/{{ version }}/dav1d-{{ version }}.tar.gz
-  sha256: 88a023e58d955e0886faf49c72940e0e90914a948a8e60c1326ce3e09e7a6099
+  sha256: 78b15d9954b513ea92d27f39362535ded2243e1b0924fde39f37a31ebed5f76b
 
 build:
   number: 0
@@ -29,7 +29,22 @@ outputs:
 
   # Everything needed to build against libdav1d (excludes binary)
   - name: dav1d-dev
-    script: install.py
+    files:
+      include:
+        - "include/**/*"  # [unix]
+        - "lib/**/*"      # [unix] 
+        - "Library/include/**/*"  # [win]
+        - "Library/lib/**/*"      # [win] 
+      exclude:
+        # versioned libs
+        - "lib/lib*.*.dylib"  # [osx]
+        - "lib/lib*.so.*"  # [linux]
+        # static libs
+        - "lib/lib*.a"  # [unix]
+        - "Library/lib/*.a.lib"  # [win]
+        - "Library/lib/*_a.lib"  # [win]
+        - "Library/lib/*static.lib"  # [win]
+        - "lib/**/*static*"  # [win]
     build:
       run_exports:
         - {{ pin_subpackage('libdav1d' ~ so_name_major) }}
@@ -59,7 +74,16 @@ outputs:
 
   # Everything needed to run the dav1d binary
   - name: dav1d
-    script: install.py
+    files:
+      include:
+        - "bin/**/*"  # [unix]
+        - "doc/**/*"  # [unix]
+        - "share/**/*"  # [unix]
+        - "Library/bin/**/*"  # [win]
+        - "Library/doc/**/*"  # [win]
+        - "Library/share/**/*"  # [win]
+      exclude:
+        - "Library/bin/*.dll"  # [win]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -86,7 +110,11 @@ outputs:
 
   # Only what's needed for run_exports downstream
   - name: libdav1d{{ so_name_major }}
-    script: install.py
+    files:
+      include:
+        - "Library/bin/*.dll"  # [win]
+        - "lib/lib*.*.dylib"  # [osx]
+        - "lib/lib*.so.*"  # [linux]
     build:
       run_exports:
         - {{ pin_subpackage('libdav1d' ~ so_name_major) }}
