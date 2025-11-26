@@ -1,7 +1,7 @@
 # library version is different from project version
 # Check 'meson.build' upstream in every release!
 context:
-  version: 1.5.0
+  version: 1.5.2
   so_name: 7.0.0
   so_name_major: ${{ so_name | split('.') | first }}
 
@@ -9,18 +9,17 @@ recipe:
   name: dav1d-split
   version: ${{ version }}
 
+build:
+  number: 1
+
 cache:
 
   source:
     - url: https://code.videolan.org/videolan/dav1d/-/archive/${{ version }}/dav1d-${{ version }}.tar.gz
-      sha256: 78b15d9954b513ea92d27f39362535ded2243e1b0924fde39f37a31ebed5f76b
+      sha256: 2fc0810b4cdf72784b3c107827ff10b1d83ec709a1ec1fbdbc6a932daf65ead6
 
   build:
-    script:
-      - if: unix
-        then: cache.sh
-      - if: win
-        then: cache.bat
+    script: cache
 
   requirements:
     build:
@@ -32,6 +31,53 @@ cache:
       - pkg-config
 
 outputs:
+
+  # Only what's needed for run_exports downstream
+  - package:
+      name: libdav1d${{ so_name_major }}
+    build:
+      files:
+        include:
+          - if: win
+            then: Library/bin/*.dll
+          - if: osx
+            then: lib/lib*.*.dylib
+          - if: linux
+            then: lib/*.so.*
+    tests:
+      - script:
+          - if: linux
+            then:
+              - test -f ${PREFIX}/lib/libdav1d.so.${{ so_name_major }}
+              - test -f ${PREFIX}/lib/libdav1d.so.${{ so_name }}
+          - if: osx
+            then:
+              - test -f ${PREFIX}/lib/libdav1d.${{ so_name_major }}.dylib
+              - test ! -f ${PREFIX}/lib/libdav1d.${{ so_name }}.dylib
+          - if: unix
+            then:
+              - test ! -f ${PREFIX}/bin/dav1d
+              - test ! -f ${PREFIX}/lib/libdav1d$SHLIB_EXT
+              - test ! -f ${PREFIX}/lib/pkgconfig/dav1d.pc
+              - test ! -f ${PREFIX}/include/dav1d/dav1d.h
+          - if: win
+            then:
+              - if not exist %PREFIX%\\Library\\bin\\dav1d.dll exit 1
+              - if exist %PREFIX%\\Library\\bin\\dav1d exit 1
+              - if exist %PREFIX%\\Library\\lib\\dav1d.lib exit 1
+              - if exist %PREFIX%\\Library\\include\\dav1d\\dav1d.h exit 1
+              - if exist %PREFIX%\\Library\\lib\\pkgconfig\\dav1d.pc exit 1
+
+  - package:
+      name: libdav1d
+    build:
+      files:
+        # Required to exclude everything else rattler-puts everything in this package
+        exclude:
+          - '*'
+    requirements:
+      run:
+        - ${{ pin_subpackage('libdav1d' ~ so_name_major, upper_bound=None) }}
 
   # Everything needed to build against libdav1d (excludes binary)
   - package:
@@ -52,8 +98,6 @@ outputs:
               - include/*
               - lib/pkgconfig/*
     requirements:
-      build:
-        - ${{ compiler('c') }}
       run:
         - ${{ pin_subpackage('libdav1d', exact=True) }}
         - ${{ pin_subpackage('libdav1d' ~ so_name_major, exact=True) }}
@@ -95,8 +139,6 @@ outputs:
           - if: unix
             then: bin/dav1d
     requirements:
-      build:
-        - ${{ compiler('c') }}
       host:
         - ${{ pin_subpackage('dav1d-dev', exact=True) }}
       run:
@@ -120,57 +162,6 @@ outputs:
           - if: win
             then:
               - if not exist %PREFIX%\\Library\\bin\\dav1d.dll exit 1
-              - if exist %PREFIX%\\Library\\lib\\dav1d.lib exit 1
-              - if exist %PREFIX%\\Library\\include\\dav1d\\dav1d.h exit 1
-              - if exist %PREFIX%\\Library\\lib\\pkgconfig\\dav1d.pc exit 1
-
-  - package:
-      name: libdav1d
-    build:
-      files:
-        # Required to exclude everything else rattler-puts everything in this package
-        exclude:
-          - '*'
-    requirements:
-      run:
-        - ${{ pin_subpackage('libdav1d' ~ so_name_major, upper_bound=None) }}
-
-  # Only what's needed for run_exports downstream
-  - package:
-      name: libdav1d${{ so_name_major }}
-    build:
-      files:
-        include:
-          - if: win
-            then: Library/bin/*.dll
-          - if: osx
-            then: lib/lib*.*.dylib
-          - if: linux
-            then: lib/*.so.*
-    requirements:
-      build:
-        - ${{ compiler('c') }}
-        - ${{ stdlib("c") }}
-    tests:
-      - script:
-          - if: linux
-            then:
-              - test -f ${PREFIX}/lib/libdav1d.so.${{ so_name_major }}
-              - test -f ${PREFIX}/lib/libdav1d.so.${{ so_name }}
-          - if: osx
-            then:
-              - test -f ${PREFIX}/lib/libdav1d.${{ so_name_major }}.dylib
-              - test ! -f ${PREFIX}/lib/libdav1d.${{ so_name }}.dylib
-          - if: unix
-            then:
-              - test ! -f ${PREFIX}/bin/dav1d
-              - test ! -f ${PREFIX}/lib/libdav1d$SHLIB_EXT
-              - test ! -f ${PREFIX}/lib/pkgconfig/dav1d.pc
-              - test ! -f ${PREFIX}/include/dav1d/dav1d.h
-          - if: win
-            then:
-              - if not exist %PREFIX%\\Library\\bin\\dav1d.dll exit 1
-              - if exist %PREFIX%\\Library\\bin\\dav1d exit 1
               - if exist %PREFIX%\\Library\\lib\\dav1d.lib exit 1
               - if exist %PREFIX%\\Library\\include\\dav1d\\dav1d.h exit 1
               - if exist %PREFIX%\\Library\\lib\\pkgconfig\\dav1d.pc exit 1
