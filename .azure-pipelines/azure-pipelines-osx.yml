@@ -9,13 +9,13 @@ jobs:
   strategy:
     matrix:
       osx_64_:
-        VMIMAGE: macOS-15
         CONFIG: osx_64_
         UPLOAD_PACKAGES: 'True'
+        VMIMAGE: macOS-15
       osx_arm64_:
-        VMIMAGE: macOS-15-arm64
         CONFIG: osx_arm64_
         UPLOAD_PACKAGES: 'True'
+        VMIMAGE: macOS-15-arm64
   timeoutInMinutes: 360
   variables: {}
 
