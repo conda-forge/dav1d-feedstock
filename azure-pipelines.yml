@@ -7,10 +7,10 @@ stages:
   condition: |
     and(
       not(contains(variables['Build.SourceVersionMessage'], '[skip ci]')),
-      not(contains(variables['Build.SourceVersionMessage'], '[ci skip]'))
-      not(contains(variables['Build.SourceVersionMessage'], '[skip azure]'))
-      not(contains(variables['Build.SourceVersionMessage'], '[skip azp]'))
-      not(contains(variables['Build.SourceVersionMessage'], '***NO_CI***'))
+      not(contains(variables['Build.SourceVersionMessage'], '[ci skip]')),
+      not(contains(variables['Build.SourceVersionMessage'], '[skip azure]')),
+      not(contains(variables['Build.SourceVersionMessage'], '[skip azp]')),
+      not(contains(variables['Build.SourceVersionMessage'], '***NO_CI***')),
     )
   jobs:
     - template: ./.azure-pipelines/azure-pipelines-linux.yml
